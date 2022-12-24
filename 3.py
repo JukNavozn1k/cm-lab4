@@ -1,38 +1,45 @@
-"""
-3. Вычислить определённый интеграл по квадратурной формуле Гаусса. Для оценки погрешности взять различное количество узлов:
-n1=5; n2=8.
-Квадратурная формула Гаусса с 5 узлами:
-x1=-x5=-0,90618        A1=A5=0,23698
-x2=-x4=-0,538469       A2=A4=0,47863
-x3=0                                 A3=0,56889
-Квадратурная формула Гаусса с 8 узлами:
-x1=-x8=-0,96028986     A1=A8=0,10122854
-x2=-x7=-0,79666648     A2=A7=0,22238103
-x3=-x6=-0,52553242     A3=A6=0,31370664
-x4=-x5=-0,18343464     A4=A5=0,36268378
+import numpy as np
+from tabulate import tabulate
 
-"""
+def func(x):
+    return x**2 / np.sqrt(x**2 + 1)
 
-import math
+# Gauss quadrature formula with 5 nodes
+n1 = 5
+x1 = np.array([-0.90618, -0.538469, 0, 0.538469, 0.90618])
+A1 = np.array([0.23698, 0.47863, 0.56889, 0.47863, 0.23698])
 
-def f(x):
-  # Define the function to be integrated here
-  return x**2 / math.sqrt(x**2 + 1)
+# Generate table for 5 nodes
+table1 = []
+for i in range(n1):
+    table1.append([x1[i], A1[i]])
+print(tabulate(table1, headers=['x', 'A'], floatfmt=".10f"))
 
-def gauss_quadrature(n, x, A):
-  result = 0
-  for i in range(n):
-    result += A[i] * f(x[i])
-  return result
+# Calculate definite integral with 5 nodes
+a = -0.5
+b = 1.3
+integral1 = 0
+for i in range(n1):
+    integral1 += A1[i] * func((b - a) / 2 * x1[i] + (b + a) / 2)
+integral1 *= (b - a) / 2
+print("Definite integral with 5 nodes:", integral1)
 
-# Test the function with n = 5
-x = [-0.90618, -0.538469, 0, 0.538469, 0.90618]
-A = [0.23698, 0.47863, 0.56889, 0.47863, 0.23698]
-result = gauss_quadrature(5, x, A)
-print(result)
+# Gauss quadrature formula with 8 knots
+n2 = 8
+x2 = np.array([-0.96028986, -0.79666648, -0.52553242, -0.18343464, 
+               0.18343464, 0.52553242, 0.79666648, 0.96028986])
+A2 = np.array([0.10122854, 0.22238103, 0.31370664, 0.36268378, 
+               0.36268378, 0.31370664, 0.22238103, 0.10122854])
 
-# Test the function with n = 8
-x = [-0.96028986, -0.79666648, -0.52553242, -0.18343464, 0.18343464, 0.52553242, 0.79666648, 0.96028986]
-A = [0.10122854, 0.22238103, 0.31370664, 0.36268378, 0.36268378, 0.31370664, 0.22238103, 0.10122854]
-result = gauss_quadrature(8, x, A)
-print(result)
+# Generate table for 8 nodes
+table2 = []
+for i in range(n2):
+    table2.append([x2[i], A2[i]])
+print(tabulate(table2, headers=['x', 'A'], floatfmt=".10f"))
+
+# Calculate definite integral with 8 nodes
+integral2 = 0
+for i in range(n2):
+    integral2 += A2[i] * func((b - a) / 2 * x2[i] + (b + a) / 2)
+integral2 *= (b - a) / 2
+print("Definite integral with 8 nodes:", integral2)
