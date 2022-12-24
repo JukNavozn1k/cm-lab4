@@ -1,37 +1,52 @@
-'''
-
-1. Вычислить определённый интеграл с точностью до 0,0001. Выбрать значение n, обеспечивающее заданную точность, из формулы остаточного члена.
-Задание:
-Определённый интеграл от функции:   1/sqrt(2*x^2+1)              
-Пределы интегрирования:  [0,8;1,6]    
-Использовать формулу Симпсона.
-
-
-'''
-
-
 import math
+from tabulate import tabulate
+
+def simpson(f, a, b, n):
+    """
+    Approximate the definite integral of the function f(x) over the interval [a, b] using the Simpson's rule.
+    """
+    h = (b - a) / n
+    result = f(a) + f(b)
+    for i in range(1, n, 2):
+        result += 4 * f(a + i * h)
+    for i in range(2, n-1, 2):
+        result += 2 * f(a + i * h)
+    return result * h / 3
 
 def f(x):
-  return 1/math.sqrt(2*x**2 + 1)
+    """
+    The function to be integrated.
+    """
+    return 1 / math.sqrt(2*x**2 + 1)
 
-def simpson(a, b, n):
-  h = (b - a) / n
-  x0 = a
-  xn = b
-  result = f(x0) + f(xn)
+# Set the integration limits and desired accuracy
+a, b = 0, 100
+# Compute the definite integral using the Simpson's rule for different values of n
+n = 10
+accuracy = 0.0001
 
-  for i in range(1, n, 2):
-    result += 4 * f(a + i * h)
+# Initialize the tables to store the results
+results = []
+residuals = []
 
-  for i in range(2, n-1, 2):
-    result += 2 * f(a + i * h)
 
-  result *= h / 3
-  return result
 
-a = 0
-b = 8
-n = 100  # choose a value for n that gives the desired accuracy
-result = simpson(a, b, n)
-print(result)
+while True:
+    result = simpson(f, a, b, n)
+    h = (b - a) / n
+    residual = (b - a) * h**4 / (180 * n**4) * max(abs(f(x)) for x in [a, b])
+    results.append(result)
+    residuals.append(residual)
+    
+    # Print the results and residual terms at each iteration
+    print(f"n = {n}, Result = {result:.4f}, Residual term = {residual:.4e}")
+    
+    # If the residual term is less than the desired accuracy, break the loop
+    if abs(residual) < accuracy:
+        break 
+    n *= 2
+
+# Print the results in a table using the tabulate library
+headers = ["n", "Result", "Residual term"]
+table = [headers] + list(zip(range(10, n+1, 10), results, residuals))
+print(tabulate(table, headers="firstrow", floatfmt=".4f"))
